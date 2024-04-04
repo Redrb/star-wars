@@ -2,9 +2,9 @@ service: reto-indra
 frameworkVersion: '3'
 
 plugins:
+  - serverless-auto-swagger
   - serverless-offline
   - serverless-offline-ssm
-  
 custom:
   serverless-offline-ssm:
     stages:
@@ -37,6 +37,7 @@ functions:
       - httpApi:
           path: /vehicles
           method: post
+          bodyType: helloPostBody
   getVehicles:
     handler: src/functions/vehicle/list.handler
     events:

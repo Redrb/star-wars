@@ -89,7 +89,5 @@ describe("createVehicle", () => {
     const body = JSON.parse(response.body);
     expect(response.statusCode).toBe(500);
     expect(body.message).toBe("Ha ocurrido un error al crear el vehículo");
-
-
   });
 });
