@@ -1,10 +1,28 @@
 service: reto-indra
 frameworkVersion: '3'
 
+plugins:
+  - serverless-offline
+  - serverless-offline-ssm
+  
+custom:
+  serverless-offline-ssm:
+    stages:
+      - local
+      - dev
+
 provider:
   name: aws
   runtime: nodejs18.x
   region: us-west-2
+  iam:
+    role:
+      statements:
+      - Effect: Allow
+        Action:
+          - dynamodb:*
+        Resource:
+          - arn:aws:dynamodb:us-west-2:299735362247:table/vehicles
 
 functions:
   api:
@@ -13,3 +31,46 @@ functions:
       - httpApi:
           path: /
           method: get
+  createVehicle:
+    handler: src/functions/vehicle/create.handler
+    events:
+      - httpApi:
+          path: /vehicles
+          method: post
+  getVehicles:
+    handler: src/functions/vehicle/list.handler
+    events:
+      - httpApi:
+          path: /vehicles
+          method: get
+  getSourceVehicles:
+    handler: src/functions/vehicle/sourceList.handler
+    events:
+      - httpApi:
+          path: /source-vehicles
+          method: get
+  deleteVehicleById:
+    handler: src/functions/vehicle/delete.handler
+    events:
+      - httpApi:
+          path: /vehicles/{id}
+          method: delete
+  updateVehicleById:
+    handler: src/functions/vehicle/update.handler
+    events:
+      - httpApi:
+          path: /vehicles/{id}
+          method: put
+resources:
+  Resources:
+    VehiclesTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: vehicles
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
